@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Islamic-inspired color palette */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 355.7 100% 97.3%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 142 76% 36%;
+  --radius: 0.5rem;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+
+  /* Islamic design tokens */
+  --islamic-gold: 45 100% 51%;
+  --islamic-green: 142 76% 36%;
+  --islamic-blue: 210 100% 56%;
+  --islamic-cream: 48 100% 96%;
+  --gradient-islamic: linear-gradient(135deg, hsl(var(--islamic-green)), hsl(var(--islamic-blue)));
+  --gradient-gold: linear-gradient(135deg, hsl(var(--islamic-gold)), hsl(45 100% 61%));
+  --shadow-elegant: 0 10px 30px -10px hsl(var(--islamic-green) / 0.2);
+  --shadow-gold: 0 4px 20px hsl(var(--islamic-gold) / 0.3);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 142 76% 36%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Islamic design elements */
+.islamic-pattern {
+  background-image: radial-gradient(circle at 1px 1px, hsl(var(--islamic-green) / 0.1) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+.arabic-text {
+  font-family: 'Amiri', 'Times New Roman', serif;
+  direction: rtl;
+  text-align: right;
+}
+
+.calligraphy-accent {
+  background: var(--gradient-gold);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mosque-shadow {
+  box-shadow: var(--shadow-elegant);
+}
+
+.prayer-time-card {
+  background: linear-gradient(135deg, hsl(var(--islamic-cream)), hsl(var(--background)));
+  border: 1px solid hsl(var(--islamic-gold) / 0.2);
+}
+
+.hero-gradient {
+  background: var(--gradient-islamic);
+}
+
+.section-divider {
+  background: var(--gradient-gold);
+  height: 2px;
+  width: 60px;
+  margin: 0 auto;
+}
