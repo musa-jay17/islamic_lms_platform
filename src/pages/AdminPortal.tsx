@@ -689,6 +689,8 @@ export default function AdminPortal() {
       }
 
       setAnnDialogOpen(false);
+      await fetchAnnouncements();
+      setLastSync(new Date());
     } catch (e: any) {
       console.error(e);
       toast.error(`Failed to save announcement: ${explainSupabaseError(e)}`);
@@ -844,7 +846,8 @@ export default function AdminPortal() {
       setAssignCourseId("");
       setAdminNotes("");
 
-      await fetchEnrollments(); // joins
+      await Promise.all([fetchEnrollments(), fetchApplications()]);
+      setLastSync(new Date());
     } catch (e: any) {
       console.error(e);
       toast.error(`Failed to approve application: ${explainSupabaseError(e)}`);
@@ -882,6 +885,8 @@ export default function AdminPortal() {
       setSelectedApp(null);
       setAssignCourseId("");
       setAdminNotes("");
+      await fetchApplications();
+      setLastSync(new Date());
     } catch (e: any) {
       console.error(e);
       toast.error(`Failed to deny application: ${explainSupabaseError(e)}`);
