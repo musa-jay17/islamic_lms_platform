@@ -22,31 +22,63 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) await fetchProfile(u.id);
-      else setProfile(null);
-      setLoading(false);
+      try {
+        const u = session?.user ?? null;
+        if (!isMounted) return;
+        setUser(u);
+        if (u) await fetchProfile(u.id);
+        else setProfile(null);
+      } catch (error) {
+        console.error("Failed to handle auth state change", error);
+        if (!isMounted) return;
+        setUser(null);
+        setProfile(null);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     });
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) await fetchProfile(u.id);
-      setLoading(false);
-    });
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Failed to load auth session", error);
+        }
+        const u = session?.user ?? null;
+        if (!isMounted) return;
+        setUser(u);
+        if (u) await fetchProfile(u.id);
+        else setProfile(null);
+      } catch (error) {
+        console.error("Failed to initialize auth session", error);
+        if (!isMounted) return;
+        setUser(null);
+        setProfile(null);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-    return () => subscription.unsubscribe();
+    initSession();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("user_profiles_2025_11_15_16_09")
       .select("*")
       .eq("user_id", userId)
       .single();
 
+    if (error) {
+      console.error("Failed to fetch user profile", error);
+    }
     setProfile(data ?? null);
   };
 
