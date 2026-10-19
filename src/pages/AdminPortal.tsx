@@ -13,6 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { PendingApplicationsCard } from "@/features/admin/components/PendingApplicationsCard";
+import { usePendingApplicationsCount } from "@/features/admin/hooks/usePendingApplicationsCount";
 
 import {
   Users,
@@ -122,6 +124,12 @@ export default function AdminPortal() {
   const [busyAction, setBusyAction] = useState(false);
   const [selectedTab, setSelectedTab] = useState("dashboard");
   const [lastSync, setLastSync] = useState<Date | null>(null);
+  const {
+    count: pendingApplicationsCount,
+    loading: pendingApplicationsLoading,
+    error: pendingApplicationsError,
+    refresh: refreshPendingApplicationsCount,
+  } = usePendingApplicationsCount();
 
   const [me, setMe] = useState<any>(null);
   const [myProfile, setMyProfile] = useState<any>(null);
@@ -220,6 +228,7 @@ export default function AdminPortal() {
             if (eventType === "DELETE") return list.filter((r) => r.id !== old?.id);
             return list;
           });
+          void refreshPendingApplicationsCount();
         }
       )
       .on(
@@ -263,8 +272,7 @@ export default function AdminPortal() {
     return () => {
       supabase.removeChannel(channel);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [me]);
+  }, [me, refreshPendingApplicationsCount]);
 
   async function loadMeAndGuard() {
     const { data } = await supabase.auth.getUser();
@@ -304,7 +312,7 @@ export default function AdminPortal() {
   async function handleRefresh() {
     setBusyAction(true);
     try {
-      await fetchAll();
+      await Promise.all([fetchAll(), refreshPendingApplicationsCount()]);
       toast.success("Data refreshed.");
     } catch (e) {
       console.error(e);
@@ -847,6 +855,7 @@ export default function AdminPortal() {
       setAdminNotes("");
 
       await Promise.all([fetchEnrollments(), fetchApplications()]);
+      await refreshPendingApplicationsCount();
       setLastSync(new Date());
     } catch (e: any) {
       console.error(e);
@@ -886,6 +895,7 @@ export default function AdminPortal() {
       setAssignCourseId("");
       setAdminNotes("");
       await fetchApplications();
+      await refreshPendingApplicationsCount();
       setLastSync(new Date());
     } catch (e: any) {
       console.error(e);
@@ -997,14 +1007,19 @@ export default function AdminPortal() {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="enrollments">Enrollments</TabsTrigger>
-            <TabsTrigger value="applications">Applications</TabsTrigger>
+            <TabsTrigger value="applications" className="gap-2">
+              Applications
+              {!pendingApplicationsLoading && !pendingApplicationsError && pendingApplicationsCount > 0 && (
+                <Badge variant="secondary">{pendingApplicationsCount}</Badge>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="announcements">Announcements</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
           </TabsList>
 
           {/* Dashboard */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
               <Card>
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
@@ -1050,6 +1065,16 @@ export default function AdminPortal() {
                   <UserCheck className="h-8 w-8 text-orange-600" />
                 </CardContent>
               </Card>
+
+              <PendingApplicationsCard
+                count={pendingApplicationsCount}
+                loading={pendingApplicationsLoading}
+                error={pendingApplicationsError}
+                onReview={() => {
+                  setAppStatusFilter("pending");
+                  setSelectedTab("applications");
+                }}
+              />
             </div>
           </TabsContent>
 
